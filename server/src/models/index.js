@@ -1,24 +1,22 @@
-import Gimnasios from "./Gimnasios.js";
-import Usuarios from "./Usuarios.js";
-import Membresias from "./Membresias.js";
-import Planes from "./Planes.js";
+import Gym from "./Gym.js";
+import User from "./User.js";
+import Membership from "./Membership.js";
+import Plan from "./Plan.js";
 import sequelize from "../config/database.js";
 
-Gimnasios.hasMany(Usuarios);
-Usuarios.belongsTo(Gimnasios);
+User.hasMany(Gym, { foreignKey: "ownerId", as: "gyms" });
+Gym.belongsTo(User, { foreignKey: "ownerId", as: "owner" });
 
-Gimnasios.hasMany(Membresias);
-Membresias.belongsTo(Gimnasios);
+Gym.hasMany(Plan, { foreignKey: "gymId" });
+Plan.belongsTo(Gym, { foreignKey: "gymId" });
 
-Gimnasios.hasMany(Planes);
-Planes.belongsTo(Gimnasios);
+User.hasMany(Membership, { foreignKey: "userId" });
+Membership.belongsTo(User, { foreignKey: "userId" });
 
+Gym.hasMany(Membership, { foreignKey: "gymId" });
+Membership.belongsTo(Gym, { foreignKey: "gymId" });
 
-Usuarios.hasMany(Membresias);
-Membresias.belongsTo(Usuarios);
+Plan.hasMany(Membership, { foreignKey: "planId" });
+Membership.belongsTo(Plan, { foreignKey: "planId" });
 
-Planes.hasMany(Membresias);
-Membresias.belongsTo(Planes);
-
-
-export { sequelize, Gimnasios, Usuarios, Membresias, Planes };
+export { sequelize, Gym, User, Membership, Plan };

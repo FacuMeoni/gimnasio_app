@@ -1,14 +1,14 @@
 import { DataTypes } from "sequelize";
 import sequelize from "../config/database.js";
 
-const Usuarios = sequelize.define("usuarios", {
+const User = sequelize.define("User", {
     id: {
         type: DataTypes.UUID,
         defaultValue: DataTypes.UUIDV4,
         primaryKey: true,
         allowNull: false,
     },
-    nombre_completo: {
+    fullName: {
         type: DataTypes.STRING,
         allowNull: false,
     },
@@ -20,17 +20,18 @@ const Usuarios = sequelize.define("usuarios", {
             isEmail: true,
         },
     },
-    contraseña: {
+    password: {
         type: DataTypes.STRING,
         allowNull: false,
     },
-    rol: {
-        type: DataTypes.ENUM("superadmin", "admin", "usuario"),
+    role: {
+        type: DataTypes.ENUM("superadmin", "admin", "user"),
         allowNull: false,
-        defaultValue: "usuario",
-    }
+        defaultValue: "user",
+    },
 }, {
+    tableName: "users",
     timestamps: false,
 });
 
-export default Usuarios;
+export default User;

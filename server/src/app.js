@@ -2,6 +2,8 @@ import Express from "express";
 import {sequelize} from "./models/index.js";
 import cors from "cors";
 import morgan from "morgan";
+import Routes from "./routes/index.js";
+import { PORT } from "./utils/envProvider.js";
 
 const app = Express();
 
@@ -10,24 +12,20 @@ app.use(cors());
 app.use(morgan("dev"));
 app.use(Express.urlencoded({ extended: true }));
 
-app.get("/", (req, res) => {
-    res.send("Hello World");
-});
-
-const PORT = process.env.PORT || 3000;
+app.use("/api", Routes);
 
 async function main() {
     try {
         await sequelize.authenticate();
-        console.log("✅ Base de datos autenticada");
+        console.log("✅ Database authenticated");
 
-        await sequelize.sync({ force: false });
-        console.log("✅ Base de datos y relaciones sincronizadas");
+        await sequelize.sync({ force: true });
+        console.log("✅ Database and relations synced");
 
-        app.listen(PORT)
-        console.log(`🚀 Servidor corriendo en http://localhost:${PORT}`);
+        app.listen(PORT);
+        console.log(`🚀 Server running at http://localhost:${PORT}`);
     } catch (error) {
-        console.error("❌ Error al iniciar el sistema:", error);
+        console.error("❌ Error starting system:", error);
     }
 }
 

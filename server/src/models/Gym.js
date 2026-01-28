@@ -1,23 +1,24 @@
 import { DataTypes } from "sequelize";
 import sequelize from "../config/database.js";
 
-const Gimnasios = sequelize.define("gimnasios", {
+const Gym = sequelize.define("Gym", {
     id: {
         type: DataTypes.UUID,
         defaultValue: DataTypes.UUIDV4,
         primaryKey: true,
         allowNull: false,
     },
-    nombre: {
+    name: {
         type: DataTypes.STRING,
         allowNull: false,
     },
-    ubicacion: {
+    location: {
         type: DataTypes.STRING,
         allowNull: false,
     },
 }, {
+    tableName: "gyms",
     timestamps: false,
 });
 
-export default Gimnasios;
+export default Gym;

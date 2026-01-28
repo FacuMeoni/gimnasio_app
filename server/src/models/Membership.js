@@ -1,32 +1,34 @@
 import { DataTypes } from "sequelize";
 import sequelize from "../config/database.js";
 
-const Membresias = sequelize.define("membresias", {
+const Membership = sequelize.define("Membership", {
     id: {
         type: DataTypes.UUID,
         defaultValue: DataTypes.UUIDV4,
         primaryKey: true,
         allowNull: false,
     },
-    fecha_inicio: {
+    startDate: {
         type: DataTypes.DATEONLY,
         allowNull: false,
         defaultValue: DataTypes.NOW,
     },
-    fecha_vencimiento: {
+    expirationDate: {
         type: DataTypes.DATEONLY,
         allowNull: false,
     },
-    precio: {
+    price: {
         type: DataTypes.FLOAT,
         allowNull: false,
     },
-    estado: {
-        type: DataTypes.ENUM("activa", "inactiva"),
+    status: {
+        type: DataTypes.ENUM("active", "inactive"),
         allowNull: false,
-        defaultValue: "activa",
+        defaultValue: "active",
     },
-}, { timestamps : false });
+}, {
+    tableName: "memberships",
+    timestamps: false,
+});
 
-
-export default Membresias;
+export default Membership;

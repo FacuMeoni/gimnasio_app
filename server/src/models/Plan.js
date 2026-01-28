@@ -1,28 +1,31 @@
 import { DataTypes } from "sequelize";
 import sequelize from "../config/database.js";
 
-const Planes = sequelize.define("planes", {
+const Plan = sequelize.define("Plan", {
     id: {
         type: DataTypes.UUID,
         defaultValue: DataTypes.UUIDV4,
         primaryKey: true,
         allowNull: false,
-    }, 
-    nombre: {
+    },
+    name: {
         type: DataTypes.STRING,
         allowNull: false,
     },
-    descripcion: {
+    description: {
         type: DataTypes.TEXT,
     },
-    precio: {
+    price: {
         type: DataTypes.DECIMAL(10, 2),
         allowNull: false,
     },
-    dias_x_semana: {
+    daysPerWeek: {
         type: DataTypes.ENUM("1", "2", "3", "7"),
         allowNull: false,
     },
-}, { timestamps : false });
+}, {
+    tableName: "plans",
+    timestamps: false,
+});
 
-export default Planes;
+export default Plan;

@@ -1,5 +1,5 @@
 import { Sequelize } from "sequelize";
-const { DB_USER, DB_PASS, DB_HOST, DB_PORT, DB_NAME } = process.env;
+import { DB_USER, DB_PASS, DB_HOST, DB_PORT, DB_NAME } from "../utils/envProvider.js";
 
 const sequelize = new Sequelize(`postgres://${DB_USER}:${DB_PASS}@${DB_HOST}:${DB_PORT}/${DB_NAME}`, { logging: false });
 

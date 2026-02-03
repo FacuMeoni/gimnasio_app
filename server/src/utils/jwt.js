@@ -25,8 +25,7 @@ export const generateRefreshToken = ({ userId, tokenId }) => {
 
 export const validateToken = (token) => {
     return jwt.verify(token, JWT_SECRET, (err, data) => {
-        if (err) throw new UnauthorizedError("Not authorized, invalid token");
-        console.log(data);
+        if (err) throw new UnauthorizedError("Not authorized, invalid token")
         return data;
     });
 }

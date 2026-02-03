@@ -8,13 +8,11 @@ export const refreshLimiter = rateLimit({
     max: 15,
     handler: async(req, res, next) => {
        const { rtoken } = req.cookies;
-       
-       if(rtoken) {
-          const decoded = jwt.decode(rtoken);
+       if(!rtoken)  throw new UnauthorizedError("Invalid refresh token");
 
-          if(decoded && decoded.tokenId) {
-            await RefreshToken.destroy({ where: { id: decoded.tokenId } });
-          }
+        const decoded = jwt.decode(rtoken);
+        if(decoded && decoded.tokenId) {
+         await RefreshToken.destroy({ where: { id: decoded.tokenId } });
        }
 
        return res.status(429).json({ message: "Too many requests, please try again later" });

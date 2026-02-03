@@ -1,28 +1,30 @@
 import { User } from "../models/index.js";
+import { BadRequestError } from "../utils/errorTemplates.js";
+import bcrypt from "bcrypt";
+import { SALT_ROUNDS } from "../utils/envProvider.js";
 
-export const registerUser = async (req, res) => {
-    try {
-        const { fullName, email, password, role } = req.body;
+export const registerAdmin = async (req, res) => { 
+    const { fullName, email, password } = req.body;
 
-        const user = await User.create({
-            fullName,
-            email,
-            password,
-            role,
-        });
+    if (!fullName || !email || !password) throw new BadRequestError("All fields are required");
 
-        return res.status(201).json({
-            message: "User created successfully",
-            newUser: {
-                fullName: user.fullName,
-                email: user.email,
-                id: user.id,
-            },
-        });
-    } catch (error) {
-        return res.status(500).json({
-            message: "Error creating user",
-            error: error.message,
-        });
-    }
-};
+    const existingAdmin = await User.findOne({ where: { email } });
+    if (existingAdmin) throw new BadRequestError("Admin already exists");
+
+    const admin = await User.create({
+        fullName,
+        email,
+        password: await bcrypt.hash(password, SALT_ROUNDS),
+        role: "admin",
+    });
+
+    return res.status(201).json({
+        message: "Admin created successfully",
+        data: {
+        user: {
+            fullName: admin.fullName,
+            id: admin.id,
+            email: admin.email,
+        },
+    }});
+}

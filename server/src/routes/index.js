@@ -1,10 +1,8 @@
 import express from "express";
-import gymRoutes from "./gymRoutes.js";
-import userRoutes from "./userRoutes.js";
+import authRoutes from "./authRoutes.js";
 
 const router = express.Router();
 
-router.use("/gym", gymRoutes);
-router.use("/user", userRoutes);
+router.use("/auth", authRoutes);
 
 export default router;

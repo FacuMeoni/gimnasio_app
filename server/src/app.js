@@ -30,6 +30,7 @@ async function main() {
         console.log(`🚀 Server running at http://localhost:${PORT}`);
     } catch (error) {
         console.error("❌ Error starting system:", error);
+        process.exit(1);
     }
 }
 

@@ -3,7 +3,7 @@ import { BadRequestError, UnauthorizedError } from "../utils/errorTemplates.js";
 import bcrypt from "bcrypt";
 import { SALT_ROUNDS } from "../utils/envProvider.js";
 import { generateAccessToken } from "../utils/jwt.js";
-import { createRefreshToken, validateRefreshToken } from "../services/authServices.js";
+import { createRefreshToken, getValidRefreshTokenById } from "../services/authServices.js";
 import { validateToken } from "../utils/jwt.js";
 import { RefreshToken } from "../models/index.js";
 
@@ -78,7 +78,7 @@ export const generateNewTokens = async(req, res) => {
     const { rtoken } = req.cookies; 
     const { userId, tokenId } = validateToken(rtoken);
     
-    const dbToken = await validateRefreshToken(tokenId);
+    const dbToken = await getValidRefreshTokenById(tokenId);
 
     const userDetails = await User.findByPk(userId, { attributes: { exclude: ["password"] } });
     if (!userDetails) throw new UnauthorizedError("Access denied, user not found");

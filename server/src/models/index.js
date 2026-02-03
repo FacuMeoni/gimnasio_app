@@ -2,6 +2,7 @@ import Gym from "./Gym.js";
 import User from "./User.js";
 import Membership from "./Membership.js";
 import Plan from "./Plan.js";
+import RefreshToken from "./refreshToken.js";
 import sequelize from "../config/database.js";
 
 User.hasMany(Gym, { foreignKey: "ownerId", as: "gyms" });
@@ -19,4 +20,7 @@ Membership.belongsTo(Gym, { foreignKey: "gymId" });
 Plan.hasMany(Membership, { foreignKey: "planId" });
 Membership.belongsTo(Plan, { foreignKey: "planId" });
 
-export { sequelize, Gym, User, Membership, Plan };
+User.hasMany(RefreshToken, { foreignKey: "userId", onDelete: "CASCADE" });
+RefreshToken.belongsTo(User, { foreignKey: "userId" });
+
+export { sequelize, Gym, User, Membership, Plan, RefreshToken };

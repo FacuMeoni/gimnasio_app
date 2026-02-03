@@ -1,0 +1,33 @@
+import jwt from "jsonwebtoken";
+import { UnauthorizedError } from "./errorTemplates.js";
+import { JWT_SECRET } from "./envProvider.js";
+
+
+export const generateAccessToken = ({ userId, role, gymId }) => {
+    return jwt.sign(
+        { 
+            userId: userId, 
+            role: role, 
+            gymId: gymId || null 
+        },
+        JWT_SECRET,
+        { expiresIn: "10m" }
+    );
+};
+
+export const generateRefreshToken = ({ userId, tokenId }) => {
+    return jwt.sign(
+        { userId: userId, tokenId: tokenId },
+        JWT_SECRET,
+        { expiresIn: "7d" }
+    );
+}; 
+
+export const validateToken = (token) => {
+    return jwt.verify(token, JWT_SECRET, (err, data) => {
+        if (err) throw new UnauthorizedError("Not authorized, invalid token");
+        console.log(data);
+        return data;
+    });
+}
+

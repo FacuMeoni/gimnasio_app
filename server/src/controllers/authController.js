@@ -52,7 +52,7 @@ export const login = async (req, res) => {
      const user = await User.findOne({ where: { email } });
      if (!user || !(await bcrypt.compare(password, user.password))) throw new UnauthorizedError("Invalid credentials") ; 
  
-     const accessToken = generateAccessToken({ id: user.id, role: user.role, gymId: user.gymId || null });
+     const accessToken = generateAccessToken({ userId: user.id, role: user.role });
      const refreshToken = await createRefreshToken({ userId: user.id, ipAddress: req.ip, userAgent: req.headers["user-agent"] });
  
      return res

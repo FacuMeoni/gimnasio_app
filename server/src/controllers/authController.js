@@ -10,8 +10,6 @@ import { RefreshToken } from "../models/index.js";
 export const registerSuperAdmin = async (req, res) => {
     const { fullName, email, password } = req.body;
  
-    if (!fullName || !email || !password) throw new BadRequestError("All fields are required");
- 
     const existingSuperAdmin = await User.findOne({ where: { email }, attributes: { exclude: ["password"] } });
     if (existingSuperAdmin) throw new BadRequestError("Super admin already exists");
  
@@ -122,7 +120,7 @@ export const logout = async(req, res) => {
 }
 
 export const registerUser = async(req, res) => {
-    const { fullName, email, password, birthDate, height, weight, injuries, goals, dni, phone } = req.body;
+    const { fullName, email, password, birthDate, height, weight_history, injuries, goals, dni, phone } = req.body;
 
     if(!fullName || !email || !password) throw new BadRequestError("All fields are required");
 
@@ -133,9 +131,9 @@ export const registerUser = async(req, res) => {
         fullName,
         email,
         password: await bcrypt.hash(password, SALT_ROUNDS),
-        birthDate,
+        birth_date: birthDate,
         height,
-        weight,
+        weight_history: weight_history ?? [],
         injuries,
         goals,
         dni,

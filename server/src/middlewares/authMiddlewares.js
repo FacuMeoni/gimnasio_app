@@ -12,7 +12,7 @@ export const authenticateUser = async (req, res, next) => {
     const { userId } = validateToken(token);
     
     const currentUser = await User.findByPk(userId ,{ attributes: { exclude: ["password"] } });
-    if (!currentUser) throw new UnauthorizedError("User no longer exists");
+    if (!currentUser) throw new UnauthorizedError("You are not authorized to access this resource");
 
     req.user = currentUser;
     next();

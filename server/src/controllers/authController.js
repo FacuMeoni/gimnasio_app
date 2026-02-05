@@ -110,14 +110,57 @@ export const generateNewTokens = async(req, res) => {
 }
 
 export const logout = async(req, res) => {
-    const userId = req.user.id;
-    const userAgent = req.headers["user-agent"];
+    const { userId, tokenId } = validateToken(req.cookies.rtoken);
 
-    await RefreshToken.destroy({ where: { userId, userAgent } });
+    await RefreshToken.destroy({ where: { userId, id: tokenId } });
 
     return res.clearCookie("rtoken", {
         httpOnly: true,
         secure: process.env.NODE_ENV === "production",
         sameSite: "lax",
     }).status(200).json({ message: "Logged out successfully" });
+}
+
+export const registerUser = async(req, res) => {
+    const { fullName, email, password, birthDate, height, weight, injuries, goals, dni, phone } = req.body;
+
+    if(!fullName || !email || !password) throw new BadRequestError("All fields are required");
+
+    const existingUser = await User.findOne({ where: { fullName } });
+    if(existingUser) throw new BadRequestError("User already exists");
+
+    const user = await User.create({
+        fullName,
+        email,
+        password: await bcrypt.hash(password, SALT_ROUNDS),
+        birthDate,
+        height,
+        weight,
+        injuries,
+        goals,
+        dni,
+        phone,
+        role: "user",
+    });
+
+    const accessToken = generateAccessToken({ userId: user.id, role: user.role });
+    const refreshToken = await createRefreshToken({ userId: user.id, ipAddress: req.ip, userAgent: req.headers["user-agent"] });
+
+    return res
+    .cookie("rtoken", refreshToken, { 
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        maxAge: 1000 * 60 * 60 * 24 * 7,
+        sameSite: "lax",
+     })
+    .status(201).json({
+        message: "User created successfully",
+        data: { 
+            user: {
+                fullName: user.fullName,
+                id: user.id,
+                email: user.email,
+            }, access_token: { accessToken } 
+        },
+    });
 }

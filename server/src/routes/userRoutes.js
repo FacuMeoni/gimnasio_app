@@ -5,7 +5,6 @@ import { authenticateUser, checkUserRole } from "../middlewares/authMiddlewares.
 
 const router = Router();
 
-router.post("/register-admin", tryCatch(authenticateUser), tryCatch(checkUserRole("superadmin")), tryCatch(registerAdmin));
-
+router.post("/register-admin", tryCatch(authenticateUser), tryCatch(checkUserRole("superadmin", "admin")), tryCatch(registerAdmin));
 
 export default router;

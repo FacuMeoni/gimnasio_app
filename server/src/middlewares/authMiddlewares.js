@@ -6,11 +6,11 @@ import { tryCatch } from "../utils/tryCatch.js";
 export const authenticateUser = async (req, res, next) => {   
     
     const token = req.headers['authorization'].split(" ")[1];
-    
+
     if(!token)throw new UnauthorizedError("Not authorized, token is required");
     
     const { userId } = validateToken(token);
-
+    
     const currentUser = await User.findByPk(userId ,{ attributes: { exclude: ["password"] } });
     if (!currentUser) throw new UnauthorizedError("User no longer exists");
 

@@ -4,7 +4,7 @@ import bcrypt from "bcrypt";
 import { SALT_ROUNDS } from "../utils/envProvider.js";
 
 export const registerAdmin = async (req, res) => { 
-    const { fullName, email, password } = req.body;
+    const { fullName, email, password, role, phone, birthDate, dni } = req.body;
 
     if (!fullName || !email || !password) throw new BadRequestError("All fields are required");
 
@@ -15,7 +15,10 @@ export const registerAdmin = async (req, res) => {
         fullName,
         email,
         password: await bcrypt.hash(password, SALT_ROUNDS),
-        role: "admin",
+        role: role,
+        phone: phone || null,
+        birth_date: birthDate || null,
+        dni: dni || null,
     });
 
     return res.status(201).json({

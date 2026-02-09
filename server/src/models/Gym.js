@@ -12,9 +12,31 @@ const Gym = sequelize.define("Gym", {
         type: DataTypes.STRING,
         allowNull: false,
     },
+    slug: {
+        type: DataTypes.STRING,
+        allowNull: false,
+        unique: true,
+    },
     location: {
         type: DataTypes.STRING,
         allowNull: false,
+    },
+    paymentSettings: {
+        type: DataTypes.JSONB,
+        allowNull: false,
+        defaultValue: {
+            cash: { enabled: true, instructions: "" },
+            transfer: { enabled: true, alias: "", cbu: "", holderName: "", holderDni: "" },
+            onlineProviders: {
+                mercadoPago: { enabled: false, publicKey: "", accessToken: ""},
+                stripe: { enabled: false, accountId: "", currency: "" },
+            }
+        },
+    }, 
+    subscriptionStatus: {
+        type: DataTypes.ENUM("active", "inactive", "trial", "past_due", "cancelled"),
+        allowNull: false,
+        defaultValue: "trial",
     },
 }, {
     tableName: "gyms",

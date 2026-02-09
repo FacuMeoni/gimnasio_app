@@ -25,30 +25,10 @@ const User = sequelize.define("User", {
         allowNull: false,
     },
     role: {
-        type: DataTypes.ENUM("superadmin", "admin", "employee", "user"),
+        type: DataTypes.ENUM("superadmin", "admin", "employee", "partner"),
         allowNull: false,
-        defaultValue: "user",
+        defaultValue: "partner",
     },
-    weight_history: {
-        type: DataTypes.ARRAY(DataTypes.JSONB),
-        allowNull: true,
-        defaultValue: [],
-    },
-    height: {
-        type: DataTypes.FLOAT,
-        allowNull: true,
-        defaultValue: null,
-    },
-    birth_date: {
-        type: DataTypes.DATEONLY,
-        allowNull: true,
-        defaultValue: null,
-    },
-    observations: {
-        type: DataTypes.TEXT,
-        allowNull: true,
-        defaultValue: null,
-    }, 
     dni: {
         type: DataTypes.STRING,
         allowNull: true,

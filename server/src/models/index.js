@@ -3,10 +3,13 @@ import User from "./User.js";
 import Membership from "./Membership.js";
 import Plan from "./Plan.js";
 import RefreshToken from "./refreshToken.js";
+import Subscription from "./Subscriptions.js";
+import PartnerProfile from "./partnerProfile.js";
 import sequelize from "../config/database.js";
 
-User.hasMany(Gym, { foreignKey: "ownerId", as: "gyms" });
-Gym.belongsTo(User, { foreignKey: "ownerId", as: "owner" });
+
+Gym.hasMany(User, { foreignKey: "gymId", as: "users" });
+User.belongsTo(Gym, { foreignKey: "gymId" });
 
 Gym.hasMany(Plan, { foreignKey: "gymId" });
 Plan.belongsTo(Gym, { foreignKey: "gymId" });
@@ -23,4 +26,10 @@ Membership.belongsTo(Plan, { foreignKey: "planId" });
 User.hasMany(RefreshToken, { foreignKey: "userId", onDelete: "CASCADE" });
 RefreshToken.belongsTo(User, { foreignKey: "userId" });
 
-export { sequelize, Gym, User, Membership, Plan, RefreshToken };
+User.hasOne(PartnerProfile, { foreignKey: "userId", onDelete: "CASCADE" });
+PartnerProfile.belongsTo(User, { foreignKey: "userId" });
+
+Gym.hasOne(Subscription, { foreignKey: "gymId" });
+Subscription.belongsTo(Gym, { foreignKey: "gymId" });
+
+export { sequelize, Gym, User, Membership, Plan, RefreshToken, Subscription };

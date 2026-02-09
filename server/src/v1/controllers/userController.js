@@ -1,7 +1,7 @@
-import { User } from "../models/index.js";
-import { BadRequestError } from "../utils/errorTemplates.js";
+import { User } from "../../models/index.js";
+import { BadRequestError } from "../../utils/errorTemplates.js";
 import bcrypt from "bcrypt";
-import { SALT_ROUNDS } from "../utils/envProvider.js";
+import { SALT_ROUNDS } from "../../utils/envProvider.js";
 
 export const registerAdmin = async (req, res) => { 
     const { fullName, email, password, role, phone, birthDate, dni } = req.body;

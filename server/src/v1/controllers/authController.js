@@ -1,11 +1,11 @@
-import { User } from "../models/index.js";
-import { BadRequestError, UnauthorizedError } from "../utils/errorTemplates.js";
+import { User } from "../../models/index.js";
+import { BadRequestError, UnauthorizedError } from "../../utils/errorTemplates.js";
 import bcrypt from "bcrypt";
-import { SALT_ROUNDS } from "../utils/envProvider.js";
-import { generateAccessToken } from "../utils/jwt.js";
-import { createRefreshToken, getValidRefreshTokenById } from "../services/authServices.js";
-import { validateToken } from "../utils/jwt.js";
-import { RefreshToken } from "../models/index.js";
+import { SALT_ROUNDS } from "../../utils/envProvider.js";
+import { generateAccessToken } from "../../utils/jwt.js";
+import { createRefreshToken, getValidRefreshTokenById } from "../../services/authServices.js";
+import { validateToken } from "../../utils/jwt.js";
+import { RefreshToken } from "../../models/index.js";
 
 export const registerSuperAdmin = async (req, res) => {
     const { fullName, email, password } = req.body;

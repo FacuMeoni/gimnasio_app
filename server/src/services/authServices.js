@@ -1,30 +1,58 @@
-import { RefreshToken } from "../models/index.js";
-import { generateRefreshToken } from "../utils/jwt.js";
-import { UnauthorizedError } from "../utils/errorTemplates.js";
+import { BadRequestError, UnauthorizedError } from "../utils/errorTemplates.js";
+import { signAccessToken } from "../utils/jwt.js";
+import refreshTokenServices from "./refreshTokenServices.js";
+import bcrypt from "bcrypt";
+import { RefreshToken, User } from "../models/index.js";
 
-export const createRefreshToken = async ({ userId, ipAddress, userAgent }) => {
+const createSession = async (data) => {
 
-    const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
-    await RefreshToken.destroy({ where: { userId, ipAddress } });
+    const { email, password } = data;
+    if(!email || !password) throw new BadRequestError("Email or password are missing");
+    
+    const user = await User.findOne({ where: { email } });
+    if (!user || !(await bcrypt.compare(password, user.password))) throw new UnauthorizedError("Invalid credentials"); 
 
-    const dbToken = await RefreshToken.create({
-        userId,
-        ipAddress,
-        userAgent,
-        expiresAt,
+    const accessToken = signAccessToken({ userId: user.id, role: user.role });
+    const refreshToken = await refreshTokenServices.createRefreshToken({ userId: user.id, ipAddress: data.ipAddress, userAgent: data.userAgent });
+
+    return {
+        accessToken,
+        refreshToken,
+        user: {
+            fullName: user.fullName,
+            id: user.id,
+            email: user.email,
+        },
+    }
+}
+
+const createNewTokens = async (data) => {
+    const storedToken = await refreshTokenServices.validateRefreshToken(data.rtoken);
+
+    const user = await User.findByPk(storedToken.userId, { attributes: { exclude: ["password"] } });
+    if (!user) throw new UnauthorizedError("Access denied");
+
+    await RefreshToken.destroy({ where: { userId: storedToken.userId, ipAddress: data.ipAddress } });
+
+    const accessToken = signAccessToken({ userId: user.id, role: user.role, gymId: user.gymId ?? null });
+    const refreshToken = await refreshTokenServices.createRefreshToken({
+        userId: user.id,
+        ipAddress: data.ipAddress,
+        userAgent: data.userAgent,
     });
 
-    const newRefreshToken = generateRefreshToken({ userId, tokenId: dbToken.id });
+    return {
+        accessToken,
+        refreshToken,
+        user: {
+            fullName: user.fullName,
+            id: user.id,
+            email: user.email,
+        },
+    };
+};
 
-    return newRefreshToken;
+export default { 
+    createSession,
+    createNewTokens,
 }
-
-export const getValidRefreshTokenById = async (tokenId) => {
-    const dbToken = await RefreshToken.findOne({ where: { id: tokenId } });
-    if (!dbToken) throw new UnauthorizedError("Invalid refresh token");
-
-    if (dbToken.expiresAt < new Date()) throw new UnauthorizedError("Refresh token expired");
-
-    return dbToken;
-}
-

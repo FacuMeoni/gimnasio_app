@@ -8,5 +8,5 @@ export const {
     PORT,
     SALT_ROUNDS = 10,
     JWT_SECRET,
-    JWT_EXPIRES_IN,
+    JWT_EXPIRES_IN
 } = process.env;

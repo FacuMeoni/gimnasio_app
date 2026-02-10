@@ -1,5 +1,5 @@
 import { UnauthorizedError, ForbiddenError } from "../utils/errorTemplates.js";
-import { validateToken } from "../utils/jwt.js";
+import { verifyToken } from "../utils/jwt.js";
 import { User } from "../models/index.js";
 import { tryCatch } from "../utils/tryCatch.js";
 
@@ -9,7 +9,7 @@ export const authenticate = async (req, res, next) => {
 
     if(!token)throw new UnauthorizedError("Not authorized, token is required");
     
-    const { userId } = validateToken(token);
+    const { userId } = verifyToken(token);
     
     const currentUser = await User.findByPk(userId ,{ attributes: { exclude: ["password"] } });
     if (!currentUser) throw new UnauthorizedError("You are not authorized to access this resource");

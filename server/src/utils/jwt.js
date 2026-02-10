@@ -3,7 +3,7 @@ import { UnauthorizedError } from "./errorTemplates.js";
 import { JWT_SECRET } from "./envProvider.js";
 
 
-export const generateAccessToken = ({ userId, role, gymId }) => {
+export const signAccessToken = ({ userId, role, gymId }) => {
     return jwt.sign(
         { 
             userId: userId, 
@@ -14,7 +14,7 @@ export const generateAccessToken = ({ userId, role, gymId }) => {
     );
 };
 
-export const generateRefreshToken = ({ userId, tokenId }) => {
+export const signRefreshToken = ({ userId, tokenId }) => {
     return jwt.sign(
         { userId: userId, tokenId: tokenId },
         JWT_SECRET,
@@ -22,7 +22,7 @@ export const generateRefreshToken = ({ userId, tokenId }) => {
     );
 }; 
 
-export const validateToken = (token) => {
+export const verifyToken = (token) => {
     return jwt.verify(token, JWT_SECRET, (err, data) => {
         if (err) throw new UnauthorizedError("Not authorized, invalid token")
         return data;

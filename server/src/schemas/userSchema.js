@@ -1,13 +1,16 @@
 import { z } from "zod";
 
-export const superAdminSchema = z.object({
+const superAdminSchema = z.object({
     fullName: z.string({ required_error: "Full name is required", invalid_type_error: "Full name must be a string" }).min(3, { message: "Full name must be at least 3 characters long" }).trim(),
     email: z.string({ required_error: "Email is required", invalid_type_error: "Email must be a string" }).email({ message: "Invalid email address" }).trim().toLowerCase(),
     password: z.string({ required_error: "Password is required", invalid_type_error: "Password must be a string" }).min(3, { message: "Password must be at least 3 characters long" }).trim(),
+    dni: z.string({ required_error: "DNI is required", invalid_type_error: "DNI must be a string" }).regex(/^\d{7,8}$/, {
+      message: "DNI must be 7-8 digits without dots (e.g. 44836939)",
+    }).trim(),
 })
 
 
-export const adminSchema = z.object({
+const staffSchema = z.object({
   fullName: z.string({ required_error: "Full name is required", invalid_type_error: "Full name must be a string" }).min(3, { message: "Full name must be at least 3 characters long" }).trim(),
   email: z.string({ required_error: "Email is required", invalid_type_error: "Email must be a string" }).email({ message: "Invalid email address" }).trim().toLowerCase(),
   password: z.string({ required_error: "Password is required", invalid_type_error: "Password must be a string" }).min(3, { message: "Password must be at least 3 characters long" }).trim(),
@@ -19,8 +22,7 @@ export const adminSchema = z.object({
   }).trim(),
 });
 
-
-export const userSchema = z.object({
+const partnerSchema = z.object({
   fullName: z.string({ required_error: "Full name is required", invalid_type_error: "Full name must be a string" }).min(3, { message: "Full name must be at least 3 characters long" }).trim(),
   email: z.string({ required_error: "Email is required", invalid_type_error: "Email must be a string" }).email({ message: "Invalid email address" }).trim().toLowerCase(),
   password: z.string({ required_error: "Password is required", invalid_type_error: "Password must be a string" }).min(3, { message: "Password must be at least 3 characters long" }).trim(),
@@ -39,3 +41,9 @@ export const userSchema = z.object({
   }).trim(),
   phone: z.string({ required_error: "Phone is required", invalid_type_error: "Phone must be a string" }).min(10, { message: "Phone must be at least 10 characters long" }).trim().optional(),
 })
+
+export default {
+  superAdminSchema,
+  staffSchema,
+  partnerSchema,
+}

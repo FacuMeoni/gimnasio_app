@@ -15,6 +15,6 @@ export const refreshLimiter = rateLimit({
          await RefreshToken.destroy({ where: { id: decoded.tokenId } });
        }
 
-       return res.status(429).json({ message: "Too many requests, please try again later" });
+       return res.status(429).json({ status: "FAILED", message: "Too many requests, please try again later" });
     }
 });

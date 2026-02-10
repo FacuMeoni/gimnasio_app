@@ -61,7 +61,7 @@ const revokeSession = async (req, res) => {
             sameSite: "lax",
         })
         .status(200)
-        .json({ message: "Session closed successfully" });
+        .json({ status: "OK", message: "Session closed successfully" });
 };
 
 export default {

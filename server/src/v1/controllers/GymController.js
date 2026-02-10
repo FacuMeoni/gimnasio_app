@@ -13,6 +13,7 @@ export const createGym = async(req, res) => {
     const gym = await Gym.create({ name, location, ownerId });
 
     return res.status(201).json({
+        status: "OK",
         message: "Gym created successfully",
         data: { gym },
     });

@@ -1,6 +1,7 @@
-import { User } from "../models/index.js";
+import { User, PartnerProfile } from "../models/index.js";
 import { BadRequestError } from "../utils/errorTemplates.js";
 import { Op } from "sequelize";
+import sequelize from "../config/database.js";
 import bcrypt from "bcrypt";
 import { SALT_ROUNDS } from "../utils/envProvider.js";
 
@@ -26,8 +27,21 @@ export const getOneUser = async(prop) => {
 };
 
 
+export const createPartnerWithProfile = async({ userData, profileData }) => {
+   return await sequelize.transaction(async(transaction) => {
+      const newUser = await createNewUser(userData, transaction);
+
+      await PartnerProfile.create({ ...profileData, userId: newUser.id }, { transaction});
+
+
+      return newUser;
+   })
+}
+
+
 
 export default {
     createNewUser,
     getOneUser,
+    createPartnerWithProfile,
 };

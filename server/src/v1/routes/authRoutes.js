@@ -10,7 +10,7 @@ const router = express.Router();
 
 
 router.post("/superadmin", tryCatch(validateUserSchema(schemas.superAdminSchema)), tryCatch(userController.createNewUser));
-router.post("/partner", tryCatch(validateUserSchema(schemas.partnerSchema)), tryCatch(userController.createNewUser));
+router.post("/partner", tryCatch(validateUserSchema(schemas.partnerSchema)), tryCatch(userController.createPartnerWithProfile));
 router.post("/session", tryCatch(authController.createSession));
 router.post("/session/tokens", tryCatch(refreshLimiter), tryCatch(authController.createNewTokens));
 router.delete("/session", tryCatch(authController.revokeSession));

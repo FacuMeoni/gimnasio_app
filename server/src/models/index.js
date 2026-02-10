@@ -32,4 +32,4 @@ PartnerProfile.belongsTo(User, { foreignKey: "userId" });
 Gym.hasOne(Subscription, { foreignKey: "gymId" });
 Subscription.belongsTo(Gym, { foreignKey: "gymId" });
 
-export { sequelize, Gym, User, Membership, Plan, RefreshToken, Subscription };
+export { sequelize, Gym, User, Membership, Plan, RefreshToken, Subscription, PartnerProfile };

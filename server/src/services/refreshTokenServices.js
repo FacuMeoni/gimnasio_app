@@ -29,15 +29,15 @@ const validateRefreshToken = async (token) => {
     return storedToken;
 }
 
-const revokeRefreshToken = async({ userId, ipAddress }) => {
-    if(!userId || !ipAddress) throw new BadRequestError("Data is missing");
+const revokeRefreshToken = async({ userId, tokenId }) => {
+    if(!userId || !tokenId) throw new BadRequestError("Data is missing");
     
-    const dbToken = await RefreshToken.findOne({ where: { userId, ipAddress } });
+    const dbToken = await RefreshToken.findOne({ where: { userId, id: tokenId } });
     if(!dbToken) throw new UnauthorizedError("Invalid refresh token");
 
     if(dbToken.expiresAt < new Date()) throw new UnauthorizedError("Refresh token expired");
 
-    await RefreshToken.destroy({ where: { userId, ipAddress } });
+    await RefreshToken.destroy({ where: { userId, id: tokenId } });
 
     return true;
 }

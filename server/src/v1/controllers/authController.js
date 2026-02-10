@@ -1,6 +1,7 @@
 import authServices from "../../services/authServices.js";
 import refreshTokenServices from "../../services/refreshTokenServices.js";
 
+
 const createSession = async (req, res) => {
      const { email, password } = req.body;
 
@@ -50,7 +51,8 @@ const createNewTokens = async(req, res) => {
 
 const revokeSession = async (req, res) => {
     const rtoken = req.cookies.rtoken;
-    if (rtoken) await refreshTokenServices.revokeRefreshToken(rtoken);
+    const { userId, tokenId } = refreshTokenServices.validateRefreshToken(rtoken);
+    if (rtoken) await refreshTokenServices.revokeRefreshToken({ userId, tokenId });
 
     return res
         .clearCookie("rtoken", {

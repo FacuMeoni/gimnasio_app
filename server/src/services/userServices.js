@@ -17,17 +17,7 @@ const createNewUser = async(userData, transaction = null ) => {
    return await User.create({ ...userData, password: await bcrypt.hash(userData.password, SALT_ROUNDS) }, { transaction });
 }
 
-export const getOneUser = async(prop) => {
-    if(!prop) throw new BadRequestError("Search property is missing");
-
-    const user = await User.findOne({ where: prop });
-    if(!user) throw new BadRequestError("User not found");
-
-    return user;
-};
-
-
-export const createPartnerWithProfile = async({ userData, profileData }) => {
+const createPartnerWithProfile = async({ userData, profileData }) => {
    return await sequelize.transaction(async(transaction) => {
       const newUser = await createNewUser(userData, transaction);
 
@@ -38,10 +28,27 @@ export const createPartnerWithProfile = async({ userData, profileData }) => {
    })
 }
 
+const getOneUser = async(prop) => {
+    if (!prop || typeof prop !== 'object' || Object.keys(prop).length === 0) {
+        throw new BadRequestError("Search property is missing, must be an object with at least one property.");
+    }
 
+    const user = await User.findOne({ where: prop, attributes: { exclude: ["password"] } });
+    if (!user) throw new BadRequestError("User not found");
+
+    return user;
+}
+
+const getAllUsersByGym = async(gymId, role) => {
+    const users = await User.findAll({ where: { gymId: gymId, role: role}, attributes: { exclude: ["password"] } });
+    if (!users) throw new BadRequestError("Users not found");
+
+    return users;    
+}
 
 export default {
     createNewUser,
     getOneUser,
     createPartnerWithProfile,
+    getAllUsersByGym,
 };

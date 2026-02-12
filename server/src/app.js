@@ -23,7 +23,7 @@ async function main() {
         await sequelize.authenticate();
         console.log("✅ Database authenticated");
 
-        await sequelize.sync({ force: true });
+        await sequelize.sync({ force: false });
         console.log("✅ Database and relations synced");
 
         app.listen(PORT);

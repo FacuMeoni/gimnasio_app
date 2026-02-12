@@ -7,7 +7,8 @@ export const signAccessToken = ({ userId, role, gymId }) => {
     return jwt.sign(
         { 
             userId: userId, 
-            role: role
+            role: role,
+            gymId: gymId
         },
         JWT_SECRET,
         { expiresIn: "10m" }

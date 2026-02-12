@@ -1,6 +1,6 @@
 import { BadRequestError } from "../utils/errorTemplates.js";
 
-export const validateUserSchema = (schema) => async (req, res, next) => {
+export const validateSchema = (schema) => async (req, res, next) => {
     const result = schema.safeParse(req.body);
 
     if (!result.success) {

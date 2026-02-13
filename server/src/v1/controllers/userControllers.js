@@ -52,7 +52,6 @@ const getAllPartnersByGym = async (req, res) => {
     
     return res.status(200).json({
         status: "OK",
-        message: "Partner created successfully",
         data: {
             users: users,
         },

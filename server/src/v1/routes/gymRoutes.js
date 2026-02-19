@@ -9,6 +9,6 @@ const router = Router();
 
 router.post("/", tryCatch(validateSchema(schemas.onBoarding)), tryCatch(gymController.setupGymAndAdmin));
 router.get("/:slug", tryCatch(authenticate), tryCatch(gymController.getGymBySlug));
-router.patch("/", tryCatch(authenticate), tryCatch(authorize("admin")), tryCatch(validatePartialSchema(schemas.onBoarding)), tryCatch(gymController.editGym));
+router.patch("/", tryCatch(authenticate), tryCatch(authorize("admin")), tryCatch(validatePartialSchema(schemas.gym)), tryCatch(gymController.editGym));
 
 export default router;

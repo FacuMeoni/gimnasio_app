@@ -59,7 +59,7 @@ const getGymBySlug = async(req, res) => {
 
 const editGym = async(req, res) => {
     const { id, gymId } = req.user;
-    const { gymData } = req.body;
+    const gymData = req.body;
 
     const gym = await gymServices.editGym({ gymId, gymData, userId: id });
 

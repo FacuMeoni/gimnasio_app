@@ -4,9 +4,9 @@ import { signAccessToken } from "../../utils/jwt.js";
 import RefreshTokenServices from "../../services/refreshTokenServices.js";
 
 const setupGymAndAdmin = async(req, res) => {
-    const { gymData, adminData } = req.body;
+    const { gymData, staffData } = req.body;
 
-    const { gym, owner } = await gymServices.createGymAndUser({ gymData, adminData }, sequelize.transaction());
+    const { gym, owner } = await gymServices.createGymAndUser({ gymData, staffData }, sequelize.transaction());
 
     const accessToken = signAccessToken({ userId: owner.id, role: owner.role, gymId: gym.id || null });
     const refreshToken = await RefreshTokenServices.createRefreshToken({ userId: owner.id, ipAddress: req.ip, userAgent: req.headers["user-agent"] });
@@ -25,18 +25,18 @@ const setupGymAndAdmin = async(req, res) => {
                 name: gym.name,
                 slug: gym.slug,
                 location: gym.location,
-                paymentSettings: gym.paymentSettings,
+                paymentCredentials: gym.paymentCredentials,
                 subscriptionStatus: gym.subscriptionStatus,
             },
             user: {
                 fullName: owner.fullName,
                 id: owner.id,
                 email: owner.email,
-            }, access_token: { accessToken }
+            },
+            accessToken,
         }, 
     });
 }
-
 
 const getGymBySlug = async(req, res) => {
    const { slug } = req.params;
@@ -50,15 +50,35 @@ const getGymBySlug = async(req, res) => {
             name: gymDetails.name,
             slug: gymDetails.slug,
             location: gymDetails.location,
-            paymentSettings: gymDetails.paymentSettings,
+            paymentCredentials: gymDetails.paymentCredentials,
             subscriptionStatus: gymDetails.subscriptionStatus,
         },
     },
    })
 }
 
+const editGym = async(req, res) => {
+    const { id, gymId } = req.user;
+    const { gymData } = req.body;
+
+    const gym = await gymServices.editGym({ gymId, gymData, userId: id });
+
+    return res.status(200).json({
+        status: "OK",
+        data: {
+            gym: {
+                name: gym.name,
+                slug: gym.slug,
+                location: gym.location,
+                paymentCredentials: gym.paymentCredentials,
+            },
+        },
+    });
+}
+
 
 export default {
     setupGymAndAdmin,
-    getGymBySlug
+    getGymBySlug, 
+    editGym
 }

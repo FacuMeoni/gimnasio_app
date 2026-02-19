@@ -29,6 +29,19 @@ const User = sequelize.define("User", {
         allowNull: false,
         defaultValue: "partner",
     },
+    gymId: {
+        type: DataTypes.UUID,
+        allowNull: true,
+        references: {
+            model: "gyms",
+            key: "id",
+        },
+        validate: {
+            isRequiredIfNoSuperAdmin(value){
+                if(this.role !== "superadmin" && !value) throw new Error("Gym ID is required");
+            }
+        }
+    },
     dni: {
         type: DataTypes.STRING,
         allowNull: true,

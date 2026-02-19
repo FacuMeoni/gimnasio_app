@@ -21,19 +21,20 @@ const createNewUser = async (req, res) => {
         status: "OK",
         data: {
             user: {
-            fullName: user.fullName,
-            id: user.id,
-            email: user.email,
-            }, access_token: { accessToken }
+                fullName: user.fullName,
+                id: user.id,
+                email: user.email,
+            },
+            accessToken,
         }, 
     });
 }
 
 const createPartnerWithProfile = async (req, res) => {
-    const { fullName, password, email, dni, birthDate, height, weight_history, phone, observations } = req.body;
+    const { fullName, password, email, dni, birthDate, height, weightHistory, phone, observations } = req.body;
     const { gymId } = req.user;
 
-    const result = await userServices.createPartnerWithProfile({ userData: { fullName, password, email, dni, gymId, role: "partner" }, profileData: { birth_date: new Date(birthDate), height, weight_history, phone, observations } });
+    const result = await userServices.createPartnerWithProfile({ userData: { fullName, password, email, dni, gymId, role: "partner" }, profileData: { birthDate, height, weightHistory, phone, observations } });
 
     return res.status(201).json({
         status: "OK",
@@ -53,7 +54,7 @@ const getAllPartnersByGym = async (req, res) => {
     return res.status(200).json({
         status: "OK",
         data: {
-            users: users,
+            users,
         },
     });
 }

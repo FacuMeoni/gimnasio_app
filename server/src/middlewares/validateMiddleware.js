@@ -14,7 +14,7 @@ export const validateSchema = (schema) => async (req, res, next) => {
     next();
 };  
 
-export const validateUserPartialSchema = (schema) => async(req, res, next) => {
+export const validatePartialSchema = (schema) => async(req, res, next) => {
     const result = schema.partial().safeParse(req.body);
 
     if(!result.success) { 

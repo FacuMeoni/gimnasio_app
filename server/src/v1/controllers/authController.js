@@ -18,7 +18,7 @@ const createSession = async (req, res) => {
             status: "OK",
             data: {
                 user: data.user,
-                access_token: data.accessToken 
+                accessToken: data.accessToken,
             },
         });
 }
@@ -44,7 +44,7 @@ const createNewTokens = async(req, res) => {
                 email: data.user.email,
                 role: data.user.role,
             },
-            access_token: data.accessToken
+            accessToken: data.accessToken,
         },
     });
 }

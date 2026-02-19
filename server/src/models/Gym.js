@@ -21,16 +21,12 @@ const Gym = sequelize.define("Gym", {
         type: DataTypes.STRING,
         allowNull: false,
     },
-    paymentSettings: {
+    paymentCredentials: {
         type: DataTypes.JSONB,
         allowNull: false,
         defaultValue: {
             cash: { enabled: true, instructions: "" },
             transfer: { enabled: true, alias: "", cbu: "", holderName: "", holderDni: "" },
-            onlineProviders: {
-                mercadoPago: { enabled: false, publicKey: "", accessToken: ""},
-                stripe: { enabled: false, accountId: "", currency: "" },
-            }
         },
     }, 
     subscriptionStatus: {

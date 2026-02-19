@@ -8,29 +8,32 @@ const PartnerProfile = sequelize.define("PartnerProfile", {
         primaryKey: true,
         allowNull: false,
     },
-    weight_history: {
+    weightHistory: {
         type: DataTypes.ARRAY(DataTypes.JSONB),
         allowNull: true,
         defaultValue: [],
+        field: "weight_history",
     },
     height: {
         type: DataTypes.FLOAT,
         allowNull: true,
         defaultValue: null,
     },
-    birth_date: {
+    birthDate: {
         type: DataTypes.DATEONLY,
         allowNull: true,
         defaultValue: null,
+        field: "birth_date",
     },
     observations: {
         type: DataTypes.TEXT,
         allowNull: true,
         defaultValue: null,
-    }, 
+    },
 }, {
     tableName: "partner_profiles",
     timestamps: false,
+    underscored: true,
 });
 
 export default PartnerProfile;

@@ -7,8 +7,24 @@ import schemas from "../../schemas/index.js";
 
 const router = Router();
 
-router.post("/staff", tryCatch(validateSchema(schemas.staff)), tryCatch(authenticate), tryCatch(authorize("superadmin", "admin")), tryCatch(userController.createNewUser));
-router.get("/partners", tryCatch(authenticate), tryCatch(authorize("superadmin", "admin", "employee")), tryCatch(userController.getAllPartnersByGym));
-router.post("/partners", tryCatch(authenticate), tryCatch(authorize("superadmin", "admin", "employee")), tryCatch(validateSchema(schemas.partner)), tryCatch(userController.createPartnerWithProfile));
+router.post("/staff", 
+    tryCatch(validateSchema(schemas.staff)), 
+    tryCatch(authenticate), 
+    tryCatch(authorize("superadmin", "admin")), 
+    tryCatch(userController.createNewUser)
+);
+
+router.get("/partners", 
+    tryCatch(authenticate), 
+    tryCatch(authorize("superadmin", "admin", "employee")), 
+    tryCatch(userController.getAllPartnersByGym)
+);
+
+router.post("/partners", 
+    tryCatch(authenticate), 
+    tryCatch(authorize("superadmin", "admin", "employee")), 
+    tryCatch(validateSchema(schemas.partner)), 
+    tryCatch(userController.createPartnerWithProfile)
+);
 
 export default router;

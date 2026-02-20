@@ -9,9 +9,22 @@ import userController from "../controllers/userControllers.js";
 const router = express.Router();
 
 
-router.post("/superadmin", tryCatch(validateSchema(schemas.superAdmin)), tryCatch(userController.createNewUser));
-router.post("/session", tryCatch(authController.createSession));
-router.post("/session/tokens", tryCatch(refreshLimiter), tryCatch(authController.createNewTokens));
-router.delete("/session", tryCatch(authController.revokeSession));
+router.post("/superadmin", 
+    tryCatch(validateSchema(schemas.superAdmin)), 
+    tryCatch(userController.createNewUser)
+);
+
+router.post("/session", 
+    tryCatch(authController.createSession)
+);
+
+router.post("/session/tokens", 
+    tryCatch(refreshLimiter),
+    tryCatch(authController.createNewTokens)
+);
+
+router.delete("/session", 
+    tryCatch(authController.revokeSession)
+);
 
 export default router;

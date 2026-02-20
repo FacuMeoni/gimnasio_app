@@ -15,7 +15,7 @@ const createPlan = async({ planData, gymId }) => {
 
 const getPlanById = async(planId, gymId) => {
    
-    const plan = await Plan.findOne({ where: { id: planId, gymId }});
+    const plan = await Plan.findOne({ where: { id: planId, gymId, isDeleted: false }});
     if(!plan) throw new BadRequestError("Plan not found");
 
     return plan
@@ -30,5 +30,26 @@ const getPlansByGym = async(gymId) => {
     return plans;
 }
 
+const deletePlan = async(planId, gymId) => {
 
-export default { createPlan, getPlanById, getPlansByGym };
+    const plan = await Plan.findOne({ where: { id: planId, gymId }});
+    if(!plan) throw new BadRequestError("Plan not found");
+
+    await Plan.update({ isDeleted: true }, { where: { id: planId }});
+
+    return true;
+}
+
+
+const patchPlan = async(planId, gymId, planData) => {
+    const plan = await Plan.findOne({ where: { id: planId, gymId }});
+    if(!plan) throw new BadRequestError("Plan not found");
+
+    await Plan.update(planData, { where: { id: planId, gymId }});
+    await plan.reload();
+
+    return plan;
+}
+
+
+export default { createPlan, getPlanById, getPlansByGym, deletePlan, patchPlan };

@@ -6,5 +6,4 @@ export const planSchema = z.object({
     price: z.number({ required_error: "Price is required", invalid_type_error: "Price must be a number" }).min(0, { message: "Price must be greater than 0" }),
     daysPerWeek: z.enum(["1", "2", "3", "4", "5", "6", "7"], { required_error: "Days per week is required", invalid_type_error: "Days per week must be a string" }),
     isActive: z.boolean({ required_error: "Is active is required", invalid_type_error: "Is active must be a boolean" }).optional(),
-    isDeleted: z.boolean({ required_error: "Is deleted is required", invalid_type_error: "Is deleted must be a boolean" }).optional(),
 });

@@ -12,9 +12,9 @@ const createSession = async (data) => {
     const user = await User.findOne({ where: { email } });
     if (!user || !(await bcrypt.compare(password, user.password))) throw new UnauthorizedError("Invalid credentials"); 
 
-    const accessToken = signAccessToken({ userId: user.id, role: user.role });
+    const accessToken = signAccessToken({ userId: user.id, role: user.role, gymId: user.gymId });
     const refreshToken = await refreshTokenServices.createRefreshToken({ userId: user.id, ipAddress: data.ipAddress, userAgent: data.userAgent });
-
+    
     return {
         accessToken,
         refreshToken,

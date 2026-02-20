@@ -9,7 +9,6 @@ export const errorHandler = (err, req, res, next) => {
 
         return res.status(err.statusCode).json({
             status: "FAILED",
-            success: false,
             type: err.name,
             message: err.message,
         });
@@ -23,6 +22,5 @@ export const errorHandler = (err, req, res, next) => {
         status: "FAILED",
         message: "Something went wrong while processing your request",
         type: "Internal server Error",
-        success: false,
     });
 };

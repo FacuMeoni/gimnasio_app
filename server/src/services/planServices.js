@@ -45,10 +45,9 @@ const patchPlan = async(planId, gymId, planData) => {
     const plan = await Plan.findOne({ where: { id: planId, gymId }});
     if(!plan) throw new BadRequestError("Plan not found");
 
-    await Plan.update(planData, { where: { id: planId, gymId }});
-    await plan.reload();
+    const updatedPlan = await plan.update(planData, { where: { id: planId, gymId }});
 
-    return plan;
+    return updatedPlan;
 }
 
 

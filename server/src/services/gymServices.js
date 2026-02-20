@@ -43,10 +43,9 @@ const editGym = async({ gymId, gymData, userId }) => {
     const gym = await Gym.findOne({ where: { id: gymId } });
     if (!gym) throw new BadRequestError("Gym not found");
 
-    await Gym.update(gymData, { where: { id: gymId } });
-    await gym.reload();
+    const updatedGym = await gym.update(gymData, { where: { id: gymId } });
 
-    return gym;
+    return updatedGym;
 }
 
 export default {

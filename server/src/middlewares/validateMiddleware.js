@@ -1,29 +1,29 @@
 import { BadRequestError } from "../utils/errorTemplates.js";
 
-export const validateSchema = (schema) => async (req, res, next) => {
+export const validateSchema = (schema) => (req, res, next) => {
     const result = schema.safeParse(req.body);
 
     if (!result.success) {
         const errorMessages = result.error.issues
-            .map((err) => `${err.message} on ${err.path.join(".")}`)
-            .join("; ");
+            .map((err) => `${err.path.join(".")}: ${err.message}`)
+            .join(" | ");
         throw new BadRequestError(errorMessages);
     }
 
     req.body = result.data;
     next();
-};  
+};
 
-export const validatePartialSchema = (schema) => async(req, res, next) => {
+export const validatePartialSchema = (schema) => (req, res, next) => {
     const result = schema.partial().safeParse(req.body);
 
-    if(!result.success) { 
+    if (!result.success) {
         const errorMessages = result.error.issues
-        .map((err) => `${err.message} on ${err.path.join(".")}`)
-        .join("; ");
+            .map((err) => `${err.path.join(".")}: ${err.message}`)
+            .join(" | ");
         throw new BadRequestError(errorMessages);
     }
 
     req.body = result.data;
     next();
-}
+};

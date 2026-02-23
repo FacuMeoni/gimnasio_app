@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { membershipSchema } from "./membershipSchema.js";
 
 const baseUser = z.object({
   fullName: z.string({ required_error: "Full name is required", invalid_type_error: "Full name must be a string" }).min(3, { message: "Full name must be at least 3 characters long" }).trim(),
@@ -7,7 +8,7 @@ const baseUser = z.object({
   dni: z.string({ required_error: "DNI is required", invalid_type_error: "DNI must be a string" }).regex(/^\d{7,8}$/, {
     message: "DNI must be 7-8 digits without dots (e.g. 44836939)",
   }).trim(),
-  phone: z.string({ required_error: "Phone is required", invalid_type_error: "Phone must be a string" }).min(10, { message: "Phone must be at least 10 characters long" }).trim().optional(),
+  phone: z.string({ invalid_type_error: "Phone must be a string" }).min(10, { message: "Phone must be at least 10 characters long" }).trim().optional(),
 });
 
 
@@ -21,7 +22,9 @@ export const staffSchema = baseUser.extend({
 });
 
 export const partnerSchema = baseUser.extend({
-  birthDate: z.coerce.date({ required_error: "Birth date is required", invalid_type_error: "Birth date must be a date" }).min(new Date(1900, 0, 1), { message: "Birth date must be at least 1900-01-01" }).max(new Date(), { message: "Birth date must be before today" }).optional(),
+  birthDate: z.string({ required_error: "Start date is required", invalid_type_error: "Start date must be a string" })
+  .regex(/^\d{4}-\d{2}-\d{2}$/, { message: "Must be a valid date (format YYYY-MM-DD)" })
+  .transform((val) => new Date(val)).optional(),
   height: z.number({ required_error: "Height is required", invalid_type_error: "Height must be a number" }).min(100, { message: "Height must be at least 100cm" }).max(250, { message: "Height must be less than 250cm" }).optional(),
   weightHistory: z
     .array(
@@ -32,4 +35,7 @@ export const partnerSchema = baseUser.extend({
     )
     .optional(),
   role: z.enum(["partner"], { required_error: "Role is required", invalid_type_error: "Role must be a string" }).default("partner")
-});
+}).merge(membershipSchema).refine(data => data.expirationDate > data.startDate, {
+  message: "Expiration date must be after start date",
+  path: ["expirationDate"],
+});;

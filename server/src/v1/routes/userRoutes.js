@@ -24,7 +24,7 @@ router.post("/partners",
     tryCatch(authenticate), 
     tryCatch(authorize("superadmin", "admin", "employee")), 
     tryCatch(validateSchema(schemas.partner)), 
-    tryCatch(userController.createPartnerWithProfile)
+    tryCatch(userController.onBoardPartner)
 );
 
 export default router;

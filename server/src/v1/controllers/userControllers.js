@@ -30,20 +30,31 @@ const createNewUser = async (req, res) => {
     });
 }
 
-const createPartnerWithProfile = async (req, res) => {
-    const { fullName, password, email, dni, birthDate, height, weightHistory, phone, observations } = req.body;
+const onBoardPartner = async (req, res) => {
+    const { fullName, password, email, dni, birthDate, height, weightHistory, phone, observations, startDate, expirationDate, amount, planId } = req.body;
     const { gymId } = req.user;
 
-    const result = await userServices.createPartnerWithProfile({ userData: { fullName, password, email, dni, gymId, role: "partner" }, profileData: { birthDate, height, weightHistory, phone, observations } });
+    const result = await userServices.onBoardPartner({ userData: { fullName, password, email, dni, gymId, role: "partner", phone }, profileData: { birthDate, height, weightHistory, observations }, membershipData: { startDate, expirationDate, amount, planId, gymId: gymId } });
 
     return res.status(201).json({
         status: "OK",
         data: {
             user: {
-            fullName: result.fullName,
-            id: result.id,
-            email: result.email,
-        }
+                fullName: result.user.fullName,
+                id: result.user.id,
+                email: result.user.email,
+                birthDate: result.profile.birthDate,
+                height: result.profile.height,
+                weightHistory: [...result.profile.weightHistory],
+                phone: result.profile.phone,
+                observations: result.profile.observations,
+            },
+            membership: {
+                startDate: result.membership.startDate,
+                expirationDate: result.membership.expirationDate,
+                amount: result.membership.amount,  
+                planId: result.membership.planId,
+            },
         }, 
     });
 }
@@ -61,6 +72,6 @@ const getAllPartnersByGym = async (req, res) => {
 
 export default {
     createNewUser,
-    createPartnerWithProfile,
+    onBoardPartner,
     getAllPartnersByGym,
 }

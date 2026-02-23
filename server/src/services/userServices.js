@@ -1,4 +1,4 @@
-import { User, PartnerProfile } from "../models/index.js";
+import { User, PartnerProfile, Membership } from "../models/index.js";
 import { BadRequestError } from "../utils/errorTemplates.js";
 import { Op } from "sequelize";
 import sequelize from "../config/database.js";
@@ -17,14 +17,19 @@ const createNewUser = async(userData, transaction = null ) => {
    return await User.create({ ...userData, password: await bcrypt.hash(userData.password, SALT_ROUNDS) }, { transaction });
 }
 
-const createPartnerWithProfile = async({ userData, profileData }) => {
+const onBoardPartner = async({ userData, profileData, membershipData }) => {
    return await sequelize.transaction(async(transaction) => {
       const newUser = await createNewUser(userData, transaction);
 
-      await PartnerProfile.create({ ...profileData, userId: newUser.id }, { transaction});
+      const newProfile = await PartnerProfile.create({ ...profileData, userId: newUser.id }, { transaction });
 
+      const newMembership = await Membership.create({ ...membershipData, userId: newUser.id }, { transaction });
 
-      return newUser;
+      return {
+         user: newUser.get({ plain: true }),
+         profile: newProfile.get({ plain: true }),
+         membership: newMembership.get({ plain: true }),
+      };
    })
 }
 
@@ -49,6 +54,6 @@ const getAllUsersByGym = async(gymId, role) => {
 export default {
     createNewUser,
     getOneUser,
-    createPartnerWithProfile,
+    onBoardPartner,
     getAllUsersByGym,
 };

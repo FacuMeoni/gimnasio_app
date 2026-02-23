@@ -17,9 +17,25 @@ const Membership = sequelize.define("Membership", {
         type: DataTypes.DATEONLY,
         allowNull: false,
     },
-    price: {
-        type: DataTypes.FLOAT,
+    amount: {
+        type: DataTypes.DECIMAL(10, 2),
         allowNull: false,
+    },
+    planId: {
+        type: DataTypes.UUID,
+        allowNull: false,
+        references: {
+            model: "plans",
+            key: "id",
+        },
+    },
+    userId: {
+        type: DataTypes.UUID,
+        allowNull: false,
+        references: {
+            model: "users",
+            key: "id",
+        },
     },
     status: {
         type: DataTypes.ENUM("active", "inactive"),
@@ -28,7 +44,7 @@ const Membership = sequelize.define("Membership", {
     },
 }, {
     tableName: "memberships",
-    timestamps: false,
+    timestamps: true,
 });
 
 export default Membership;

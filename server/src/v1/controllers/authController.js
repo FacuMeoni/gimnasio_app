@@ -51,8 +51,13 @@ const createNewTokens = async(req, res) => {
 
 const revokeSession = async (req, res) => {
     const rtoken = req.cookies.rtoken;
-    const { userId, tokenId } = refreshTokenServices.validateRefreshToken(rtoken);
-    if (rtoken) await refreshTokenServices.revokeRefreshToken({ userId, tokenId });
+    if (rtoken) {
+        const storedToken = await refreshTokenServices.validateRefreshToken(rtoken);
+        await refreshTokenServices.revokeRefreshToken({
+            userId: storedToken.userId,
+            tokenId: storedToken.id,
+        });
+    }
 
     return res
         .clearCookie("rtoken", {

@@ -4,8 +4,7 @@ import RefreshTokenServices from "../../services/refreshTokenServices.js";
 
 const createNewUser = async (req, res) => {
     const data = req.body;
- 
-    const user = await userServices.createNewUser(data);
+    const user = await userServices.createUser(data);
 
     const accessToken = signAccessToken({ userId: user.id, role: user.role, gymId: user.gymId || null });
     const refreshToken = await RefreshTokenServices.createRefreshToken({ userId: user.id, ipAddress: req.ip, userAgent: req.headers["user-agent"] });
@@ -60,15 +59,10 @@ const onBoardPartner = async (req, res) => {
 }
  
 const getAllPartnersByGym = async (req, res) => {
-    const users = await userServices.getAllUsersByGym(req.user.gymId, "partner");
-    
-    return res.status(200).json({
-        status: "OK",
-        data: {
-            users,
-        },
-    });
+    const partners = await userServices.getAllPartnersDetail({ gymId: req.user.gymId });
+    return res.status(200).json({ status: "OK", data: partners });
 }
+
 
 export default {
     createNewUser,

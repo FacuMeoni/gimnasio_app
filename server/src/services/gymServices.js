@@ -1,55 +1,53 @@
 import { Gym, User } from "../models/index.js";
 import sequelize from "../config/database.js";
-import { BadRequestError } from "../utils/errorTemplates.js";
+import { BadRequestError, NotFoundError, ForbiddenError } from "../utils/errorTemplates.js";
+import userServices from "./userServices.js";
 import { Op } from "sequelize";
-import bcrypt from "bcrypt";
-import { SALT_ROUNDS } from "../utils/envProvider.js";
 
 
-const createGymAndUser = async({ gymData, staffData }) => {
-    const existingGym = await Gym.findOne({ where: { name: gymData.name }});
-    const userExists = await User.findOne({ where: { [Op.or]: [ { email: staffData.email }, { dni: staffData.dni } ] }});
-    if(userExists && existingGym) throw new BadRequestError("User and gym already exists");
-     else if(existingGym) throw new BadRequestError("Gym already exists");
-        else if(userExists) throw new BadRequestError("User already exists");
-
-    return await sequelize.transaction(async(transaction) => {
-
-        const newGym = await Gym.create({ ...gymData }, { transaction });
-        const owner = await User.create({ ...staffData, password: await bcrypt.hash(staffData.password, SALT_ROUNDS), role: "admin", gymId: newGym.id }, { transaction });
-
-        return { gym: newGym, owner };
-   })
-}
-
-const getOneGym = async(prop) => {
-    if (!prop || typeof prop !== 'object' || Object.keys(prop).length === 0) {
-        throw new BadRequestError("Search property is missing, must be an object with at least one property.");
-    }
-
-    const gym = await Gym.findOne({ where: prop });
-    if (!gym) throw new BadRequestError("Gym not found");
+const getOneGym = async(where, options = {}) => {
+    const gym = await Gym.findOne({ where: { ...where }, ...options });
+    if(!gym)throw new NotFoundError("Gym not found");
 
     return gym;
 }
 
-const editGym = async({ gymId, gymData, userId }) => {
+const createGymAndAdmin = async({ gymData, adminData }) => {
+    const gym = await Gym.findOne({ where: { slug: gymData.slug } });
+    const admin = await User.findOne({ where: { [Op.or]: [{ email: adminData.email }, { dni: adminData.dni }] }}, { attributes: { exclude: ["password"] } });
 
-    const user = await User.findOne({ where: { id: userId, role: "admin" } });
-    if (!user) throw new BadRequestError("Invalid user credentials");
+    if(gym && admin)throw new BadRequestError("Gym and admin already exists");
+    else if(gym)throw new BadRequestError("Gym already exists");
+    else if(admin)throw new BadRequestError("Admin already exists");
 
-    if(user.gymId !== gymId) throw new BadRequestError("User is not associated with this gym");
+    return await sequelize.transaction(async(t) => {
+        const gym = await Gym.create({ ...gymData }, { transaction: t });
+        const admin = await userServices.createUser({ ...adminData, gymId: gym.id, role: "admin" }, t);
+        return { gym, admin };
+    })  
+}
 
-    const gym = await Gym.findOne({ where: { id: gymId } });
-    if (!gym) throw new BadRequestError("Gym not found");
+const editGym = async({ gymId, gymNewData, userId }) => {
+    if(!gymId || !gymNewData || !userId)throw new BadRequestError("Some props are missing. gymId, gymNewData and userId are required");
+    
+    const user = await userServices.getOneUser({ id: userId });
+    if(user.role !== "admin" && user.gymId !== gymId)throw new ForbiddenError("User is not authorized to edit this gym");
 
-    const updatedGym = await gym.update(gymData, { where: { id: gymId } });
-
+    const updatedGym = await Gym.update(gymNewData, { where: { id: gymId } });
     return updatedGym;
 }
 
+const deactiveGym = async({ gymId }) => {
+    if(!gymId)throw new BadRequestError("Gym ID is required");
+    const gym = await getOneGym({ id: gymId, subscriptionStatus: "active" });
+
+    await gym.update({ subscriptionStatus: "inactive" });
+    return true;
+}
+
 export default {
-    createGymAndUser,
     getOneGym,
+    createGymAndAdmin,
     editGym,
+    deactiveGym,
 }

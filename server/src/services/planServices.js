@@ -1,54 +1,37 @@
 import Plan from "../models/Plan.js";
-import { BadRequestError } from "../utils/errorTemplates.js";
+import { BadRequestError, NotFoundError } from "../utils/errorTemplates.js";
 
+const createPlan = async({ planData, gymId, transaction = null }) => {
+    const planExisted = await Plan.findOne({ where: { ...planData, gymId, isDeleted: false } });
+    if(planExisted)throw new BadRequestError("Plan already exists");
 
-const createPlan = async({ planData, gymId }) => {
-
-    const existingPlan = await Plan.findOne({ where: { name: planData.name, gymId }})
-    if(existingPlan) throw new BadRequestError("Plan already exists");
-   
-    const newPlan = await Plan.create({ ...planData, gymId });
-
-    return newPlan;
+    return await Plan.create({ ...planData, gymId }, { transaction });
 }
 
+const getOnePlanWhere = async(where, options = {}) => {
+    const plan = await Plan.findOne({ where: { ...where }, ...options });
+    if(!plan)throw new NotFoundError("Plan not found");
 
-const getPlanById = async(planId, gymId) => {
-   
-    const plan = await Plan.findOne({ where: { id: planId, gymId, isDeleted: false }});
-    if(!plan) throw new BadRequestError("Plan not found");
-
-    return plan
+    return plan;
 }
 
-
-const getPlansByGym = async(gymId) => {
-
-    const plans = await Plan.findAll({ where: { gymId, isActive: true, isDeleted: false }, order: [["price", "ASC"]] });
-    if(!plans) throw new BadRequestError("Plans not found");
+const getPlansWhere = async(where, options = {}) => {
+    const plans = await Plan.findAll({ where: { ...where }, ...options });
+    if(!plans)throw new NotFoundError("Plans not found");
 
     return plans;
 }
 
-const deletePlan = async(planId, gymId) => {
-
-    const plan = await Plan.findOne({ where: { id: planId, gymId }});
-    if(!plan) throw new BadRequestError("Plan not found");
-
-    await Plan.update({ isDeleted: true }, { where: { id: planId }});
-
+const deletePlan = async(planId) => {
+    const plan = await getOnePlanWhere({ id: planId });
+    await plan.update({ isDeleted: true });
     return true;
 }
 
-
-const patchPlan = async(planId, gymId, planData) => {
-    const plan = await Plan.findOne({ where: { id: planId, gymId }});
-    if(!plan) throw new BadRequestError("Plan not found");
-
-    const updatedPlan = await plan.update(planData, { where: { id: planId, gymId }});
-
-    return updatedPlan;
+const patchPlan = async(planId, planData) => {
+    const plan = await getOnePlanWhere({ id: planId });
+    await plan.update(planData);
+    return plan;
 }
 
-
-export default { createPlan, getPlanById, getPlansByGym, deletePlan, patchPlan };
+export default { createPlan, getOnePlanWhere, getPlansWhere, deletePlan, patchPlan };

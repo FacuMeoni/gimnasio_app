@@ -1,15 +1,14 @@
 import gymServices from "../../services/gymServices.js";
-import sequelize from "../../config/database.js";
 import { signAccessToken } from "../../utils/jwt.js";
 import RefreshTokenServices from "../../services/refreshTokenServices.js";
 
 const setupGymAndAdmin = async(req, res) => {
     const { gymData, staffData } = req.body;
 
-    const { gym, owner } = await gymServices.createGymAndUser({ gymData, staffData }, sequelize.transaction());
+    const { gym, admin } = await gymServices.createGymAndAdmin({ gymNewData: gymData, adminData: staffData });
 
-    const accessToken = signAccessToken({ userId: owner.id, role: owner.role, gymId: gym.id || null });
-    const refreshToken = await RefreshTokenServices.createRefreshToken({ userId: owner.id, ipAddress: req.ip, userAgent: req.headers["user-agent"] });
+    const accessToken = signAccessToken({ userId: admin.id, role: admin.role, gymId: gym.id || null });
+    const refreshToken = await RefreshTokenServices.createRefreshToken({ userId: admin.id, ipAddress: req.ip, userAgent: req.headers["user-agent"] });
 
     return res
     .cookie("rtoken", refreshToken, { 
@@ -29,9 +28,9 @@ const setupGymAndAdmin = async(req, res) => {
                 subscriptionStatus: gym.subscriptionStatus,
             },
             user: {
-                fullName: owner.fullName,
-                id: owner.id,
-                email: owner.email,
+                fullName: admin.fullName,
+                id: admin.id,
+                email: admin.email,
             },
             accessToken,
         }, 

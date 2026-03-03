@@ -2,15 +2,24 @@ import { BadRequestError, UnauthorizedError } from "../utils/errorTemplates.js";
 import { signAccessToken } from "../utils/jwt.js";
 import refreshTokenServices from "./refreshTokenServices.js";
 import bcrypt from "bcrypt";
-import { RefreshToken, User } from "../models/index.js";
+import userServices from "./userServices.js";
+
+
+const checkUserCredentials = async({ email, password }) => {
+
+    if(!email || !password) throw new BadRequestError("Email or password are missing");
+
+    const user = await userServices.getOneUser({ email: email });
+    if (!(await bcrypt.compare(password, user.password))) throw new UnauthorizedError("Invalid credentials"); 
+
+    return user;
+}
 
 const createSession = async (data) => {
 
     const { email, password } = data;
-    if(!email || !password) throw new BadRequestError("Email or password are missing");
     
-    const user = await User.findOne({ where: { email } });
-    if (!user || !(await bcrypt.compare(password, user.password))) throw new UnauthorizedError("Invalid credentials"); 
+    const user = await checkUserCredentials({ email, password });
 
     const accessToken = signAccessToken({ userId: user.id, role: user.role, gymId: user.gymId });
     const refreshToken = await refreshTokenServices.createRefreshToken({ userId: user.id, ipAddress: data.ipAddress, userAgent: data.userAgent });
@@ -29,10 +38,9 @@ const createSession = async (data) => {
 const createNewTokens = async (data) => {
     const storedToken = await refreshTokenServices.validateRefreshToken(data.rtoken);
 
-    const user = await User.findByPk(storedToken.userId, { attributes: { exclude: ["password"] } });
-    if (!user) throw new UnauthorizedError("Access denied");
+    const user = await userServices.getOneUser({ id: storedToken.userId });
 
-    await RefreshToken.destroy({ where: { userId: storedToken.userId, ipAddress: data.ipAddress } });
+    await refreshTokenServices.revokeRefreshToken({ userId: user.id, tokenId: storedToken.id });
 
     const accessToken = signAccessToken({ userId: user.id, role: user.role, gymId: user.gymId ?? null });
     const refreshToken = await refreshTokenServices.createRefreshToken({

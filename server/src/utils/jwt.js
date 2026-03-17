@@ -15,18 +15,18 @@ export const signAccessToken = ({ userId, role, gymId }) => {
     );
 };
 
-export const signRefreshToken = ({ userId, tokenId }) => {
+export const signRefreshToken = ({ userId, sessionId }) => {
     return jwt.sign(
-        { userId: userId, tokenId: tokenId },
+        { userId: userId, sessionId: sessionId },
         JWT_SECRET,
         { expiresIn: "7d" }
     );
 }; 
 
 export const verifyToken = (token) => {
-    return jwt.verify(token, JWT_SECRET, (err, data) => {
-        if (err) throw new UnauthorizedError("Not authorized, invalid token")
-        return data;
-    });
+    try {
+        return jwt.verify(token, JWT_SECRET);
+    } catch {
+        throw new UnauthorizedError("Not authorized, invalid token");
+    }
 }
-

@@ -1,66 +1,26 @@
-import { BadRequestError, UnauthorizedError } from "../utils/errorTemplates.js";
-import { signAccessToken } from "../utils/jwt.js";
-import refreshTokenServices from "./refreshTokenServices.js";
 import bcrypt from "bcrypt";
-import userServices from "./userServices.js";
+import { User } from "../models/index.js";
+import { BadRequestError, UnauthorizedError } from "../utils/errorTemplates.js";
+import sessionServices from "./sessionServices.js";
 
+const validateCredentials = async ({ email, password }) => {
+    if (!email || !password) throw new BadRequestError("Credentials are missing.");
 
-const checkUserCredentials = async({ email, password }) => {
+    const user = await User.findOne({ where: { email } });
+    if (!user) throw new UnauthorizedError("Invalid credentials, email or password are incorrect.");
 
-    if(!email || !password) throw new BadRequestError("Email or password are missing");
-
-    const user = await userServices.getOneUser({ email: email });
-    if (!(await bcrypt.compare(password, user.password))) throw new UnauthorizedError("Invalid credentials"); 
+    const isPasswordValid = await bcrypt.compare(password, user.password);
+    if (!isPasswordValid) throw new UnauthorizedError("Invalid credentials, email or password are incorrect.");
 
     return user;
-}
-
-const createSession = async (data) => {
-
-    const { email, password } = data;
-    
-    const user = await checkUserCredentials({ email, password });
-
-    const accessToken = signAccessToken({ userId: user.id, role: user.role, gymId: user.gymId });
-    const refreshToken = await refreshTokenServices.createRefreshToken({ userId: user.id, ipAddress: data.ipAddress, userAgent: data.userAgent });
-    
-    return {
-        accessToken,
-        refreshToken,
-        user: {
-            fullName: user.fullName,
-            id: user.id,
-            email: user.email,
-        },
-    }
-}
-
-const createNewTokens = async (data) => {
-    const storedToken = await refreshTokenServices.validateRefreshToken(data.rtoken);
-
-    const user = await userServices.getOneUser({ id: storedToken.userId });
-
-    await refreshTokenServices.revokeRefreshToken({ userId: user.id, tokenId: storedToken.id });
-
-    const accessToken = signAccessToken({ userId: user.id, role: user.role, gymId: user.gymId ?? null });
-    const refreshToken = await refreshTokenServices.createRefreshToken({
-        userId: user.id,
-        ipAddress: data.ipAddress,
-        userAgent: data.userAgent,
-    });
-
-    return {
-        accessToken,
-        refreshToken,
-        user: {
-            fullName: user.fullName,
-            id: user.id,
-            email: user.email,
-        },
-    };
 };
 
-export default { 
-    createSession,
-    createNewTokens,
-}
+const login = async ({ email, password, ipAddress, userAgent }) => {
+    const user = await validateCredentials({ email, password });
+    return sessionServices.createSession({ userId: user.id, ipAddress, userAgent });
+};
+
+export default {
+    login,
+};
+

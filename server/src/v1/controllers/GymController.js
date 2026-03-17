@@ -1,14 +1,12 @@
 import gymServices from "../../services/gymServices.js";
-import { signAccessToken } from "../../utils/jwt.js";
-import RefreshTokenServices from "../../services/refreshTokenServices.js";
+import sessionServices from "../../services/sessionServices.js";
 
 const setupGymAndAdmin = async(req, res) => {
     const { gymData, staffData } = req.body;
 
-    const { gym, admin } = await gymServices.createGymAndAdmin({ gymNewData: gymData, adminData: staffData });
+    const { gym, admin } = await gymServices.createGymAndAdmin({ gymData, adminData: staffData });
 
-    const accessToken = signAccessToken({ userId: admin.id, role: admin.role, gymId: gym.id || null });
-    const refreshToken = await RefreshTokenServices.createRefreshToken({ userId: admin.id, ipAddress: req.ip, userAgent: req.headers["user-agent"] });
+    const { accessToken, refreshToken } = await sessionServices.createSession({ userId: admin.id, ipAddress: req.ip, userAgent: req.headers["user-agent"] });
 
     return res
     .cookie("rtoken", refreshToken, { 

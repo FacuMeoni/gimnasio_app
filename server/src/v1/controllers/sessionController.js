@@ -1,11 +1,11 @@
+import sessionServices from "../../services/sessionServices.js";
 import authServices from "../../services/authServices.js";
-import refreshTokenServices from "../../services/refreshTokenServices.js";
 
 
 const createSession = async (req, res) => {
      const { email, password } = req.body;
 
-     const data = await authServices.createSession({ email, password, ipAddress: req.ip, userAgent: req.headers["user-agent"] });
+     const data = await authServices.login({ email, password, ipAddress: req.ip, userAgent: req.headers["user-agent"] });
 
      return res
         .cookie("rtoken", data.refreshToken, { 
@@ -23,10 +23,11 @@ const createSession = async (req, res) => {
         });
 }
  
-const createNewTokens = async(req, res) => {
+const refreshSession = async(req, res) => {
     const { rtoken } = req.cookies; 
+
     
-    const data = await authServices.createNewTokens({ rtoken, ipAddress: req.ip, userAgent: req.headers["user-agent"] });
+    const data = await sessionServices.refreshSession({ rtoken, ipAddress: req.ip, userAgent: req.headers["user-agent"] });
 
     return res
     .cookie("rtoken", data.refreshToken, { 
@@ -51,13 +52,8 @@ const createNewTokens = async(req, res) => {
 
 const revokeSession = async (req, res) => {
     const rtoken = req.cookies.rtoken;
-    if (rtoken) {
-        const storedToken = await refreshTokenServices.validateRefreshToken(rtoken);
-        await refreshTokenServices.revokeRefreshToken({
-            userId: storedToken.userId,
-            tokenId: storedToken.id,
-        });
-    }
+   
+    await sessionServices.revokeSession({ rtoken });
 
     return res
         .clearCookie("rtoken", {
@@ -71,6 +67,6 @@ const revokeSession = async (req, res) => {
 
 export default {
     createSession,
-    createNewTokens,
+    refreshSession,
     revokeSession,
 }
